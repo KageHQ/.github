@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./banner.png" alt="Kage" width="420" />
+<img src="./banner.png" alt="Kage" />
 
 # Kage
 
