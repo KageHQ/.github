@@ -73,14 +73,13 @@ The user holds a signed credential, generates a Groth16 proof of a predicate, an
 | Issuer (credential signing + relay) | `kage-issuer` | ✅ v1 |
 | Solana program (verify + nullifier PDA) | `kage-program` | ✅ v1 |
 | Web verifier UI | `kage-web` | ✅ v1 |
-| Mobile holder app | `kage-mobile` | 🚧 in progress |
+| Mobile holder app | `kage-mobile` | ✅ v1 |
 | Shared SDK / IDL | `kage-shared` | ✅ v1 |
 | End-to-end harness | `kage-e2e` | ✅ v1 |
 
 ### Next update
 
 - **QR handoff** — proof encoded directly in a QR payload, dropping the relay round-trip.
-- Mobile holder app to feature parity.
 
 ---
 
