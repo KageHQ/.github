@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./banner.png" alt="Kage — privacy-preserving identity, proven from the shadows" width="100%" />
+<img src="./banner.svg" alt="Kage" width="420" />
 
 <br/>
 
