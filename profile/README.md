@@ -39,19 +39,44 @@ A working zero-knowledge e-KYC demo. A user proves they hold a valid Indonesian 
 
 ```mermaid
 flowchart LR
-    M["📱 Mobile<br/>holds PII<br/>NIK in encrypted keystore<br/>snarkjs fullProve ~5–15s"]
-    Q["🔳 QR<br/>Groth16 proof + public signals<br/>256 B base64 · no PII"]
-    W["🌐 Web verifier<br/>stores no PII"]
-    S["⛓️ Solana<br/>verify proof<br/>check issuer pubkey<br/>init nullifier PDA<br/>emit Verified{wallet}"]
+    subgraph issuer["Issuer (one-time onboarding)"]
+        ISS["Mock identity provider<br/>signs credential over NIK<br/>maps NIK to nullifier secret"]
+    end
 
-    M -->|prove| Q
-    Q -.->|scan| W
-    W -->|submit tx| S
+    subgraph device["User device (trust boundary, PII never leaves)"]
+        KS["Encrypted keystore<br/>signed credential + NIK"]
+        PR["snarkjs fullProve<br/>Groth16, on-device, ~5-15s<br/>proves age >= 18 + valid signature"]
+        KS --> PR
+    end
 
-    style M fill:#1e1e2e,stroke:#888,color:#fff
-    style Q fill:#2a2a3a,stroke:#888,color:#fff
-    style W fill:#1e1e2e,stroke:#888,color:#fff
-    style S fill:#14352a,stroke:#14F195,color:#fff
+    QR["QR payload<br/>Groth16 proof + public signals<br/>256 B base64 — no PII"]
+
+    subgraph verifier["Web verifier (stores no PII)"]
+        SCAN["Scan QR"]
+        TX["Build + submit transaction"]
+        SCAN --> TX
+    end
+
+    subgraph chain["Solana program (Anchor)"]
+        V["Verify Groth16 proof"]
+        IK["Check issuer pubkey"]
+        NUL["Init nullifier PDA<br/>(exists -> reject replay)"]
+        EV["Emit Verified{wallet, slot}"]
+        V --> IK --> NUL --> EV
+    end
+
+    ISS -->|signed credential| KS
+    PR -->|encode| QR
+    QR -.->|scan| SCAN
+    TX -->|proof + signals| V
+    EV -->|pass / fail| TX
+
+    classDef trust fill:#1e1e2e,stroke:#6c6c8a,color:#e8e8f0;
+    classDef onchain fill:#0f2a20,stroke:#14F195,color:#d8ffe9;
+    classDef neutral fill:#26263a,stroke:#888,color:#e8e8f0;
+    class device,KS,PR trust;
+    class chain,V,IK,NUL,EV onchain;
+    class issuer,ISS,verifier,SCAN,TX,QR neutral;
 ```
 
 ### What makes it work
