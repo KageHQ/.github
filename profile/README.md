@@ -1,8 +1,8 @@
 <div align="center">
 
-# 影 Kage
+<img src="./banner.png" alt="Kage — privacy-preserving identity, proven from the shadows" width="100%" />
 
-### Privacy-preserving identity, proven from the shadows.
+<br/>
 
 *The proof steps into the light. Your identity stays in the dark.*
 
@@ -38,30 +38,34 @@ Kage flips the model: the user holds their own credential, proves a *predicate* 
 A working zero-knowledge e-KYC demo. A user proves they hold a valid Indonesian KTP identity card **and** are age ≥ 18 — without revealing their NIK, name, or date of birth. A Solana program checks the proof on-chain and rejects replays.
 
 ```mermaid
-flowchart LR
-    subgraph issuer["Issuer (one-time onboarding)"]
-        ISS["Mock identity provider<br/>signs credential over NIK<br/>maps NIK to nullifier secret"]
+%%{init: {"flowchart": {"htmlLabels": true, "nodeSpacing": 55, "rankSpacing": 55}, "themeVariables": {"fontSize": "18px"}}}%%
+flowchart TB
+    subgraph issuer["ISSUER — one-time onboarding"]
+        ISS["Mock identity provider<br/>signs credential over NIK<br/>maps NIK → nullifier secret"]
     end
 
-    subgraph device["User device (trust boundary, PII never leaves)"]
+    subgraph device["USER DEVICE — trust boundary, PII never leaves"]
+        direction LR
         KS["Encrypted keystore<br/>signed credential + NIK"]
-        PR["snarkjs fullProve<br/>Groth16, on-device, ~5-15s<br/>proves age >= 18 + valid signature"]
+        PR["snarkjs fullProve · Groth16<br/>on-device, ~5–15 s<br/>proves age ≥ 18 + valid signature"]
         KS --> PR
     end
 
-    QR["QR payload<br/>Groth16 proof + public signals<br/>256 B base64 — no PII"]
+    QR["QR PAYLOAD<br/>Groth16 proof + public signals<br/>256 B base64 — no PII"]
 
-    subgraph verifier["Web verifier (stores no PII)"]
+    subgraph verifier["WEB VERIFIER — stores no PII"]
+        direction LR
         SCAN["Scan QR"]
         TX["Build + submit transaction"]
         SCAN --> TX
     end
 
-    subgraph chain["Solana program (Anchor)"]
-        V["Verify Groth16 proof"]
-        IK["Check issuer pubkey"]
-        NUL["Init nullifier PDA<br/>(exists -> reject replay)"]
-        EV["Emit Verified{wallet, slot}"]
+    subgraph chain["SOLANA PROGRAM — Anchor"]
+        direction LR
+        V["Verify<br/>Groth16 proof"]
+        IK["Check<br/>issuer pubkey"]
+        NUL["Init nullifier PDA<br/>exists → reject replay"]
+        EV["Emit<br/>Verified{wallet, slot}"]
         V --> IK --> NUL --> EV
     end
 
@@ -71,9 +75,9 @@ flowchart LR
     TX -->|proof + signals| V
     EV -->|pass / fail| TX
 
-    classDef trust fill:#1e1e2e,stroke:#6c6c8a,color:#e8e8f0;
-    classDef onchain fill:#0f2a20,stroke:#14F195,color:#d8ffe9;
-    classDef neutral fill:#26263a,stroke:#888,color:#e8e8f0;
+    classDef trust fill:#1e1e2e,stroke:#6c6c8a,color:#e8e8f0,stroke-width:2px;
+    classDef onchain fill:#0f2a20,stroke:#14F195,color:#d8ffe9,stroke-width:2px;
+    classDef neutral fill:#26263a,stroke:#9090a8,color:#e8e8f0,stroke-width:2px;
     class device,KS,PR trust;
     class chain,V,IK,NUL,EV onchain;
     class issuer,ISS,verifier,SCAN,TX,QR neutral;
