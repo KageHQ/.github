@@ -27,27 +27,27 @@ Kage flips the model: the user holds their own credential, proves a *predicate* 
 
 ---
 
-## 🔬 Flagship project — `proven-kyc`
+## How it works
 
-A working zero-knowledge e-KYC demo. A user proves they hold a valid Indonesian KTP identity card **and** are age ≥ 18 — without revealing their NIK, name, or date of birth. A Solana program checks the proof on-chain and rejects replays.
+The user holds a signed credential on their device, generates a Groth16 proof of a predicate on-device, and shows it as a QR. The verifier submits the proof to a Solana program, which checks it and rejects replays — learning nothing but the result.
 
 ```mermaid
 %%{init: {"flowchart": {"htmlLabels": true, "nodeSpacing": 55, "rankSpacing": 55}, "themeVariables": {"fontSize": "18px"}}}%%
 flowchart TB
     subgraph issuer["ISSUER — one-time onboarding"]
-        ISS["Mock identity provider<br/>signs credential over NIK<br/>maps NIK → nullifier secret"]
+        ISS["Identity provider<br/>signs credential<br/>maps identity → nullifier secret"]
     end
 
     subgraph device["USER DEVICE — trust boundary, PII never leaves"]
         direction LR
-        KS["Encrypted keystore<br/>signed credential + NIK"]
-        PR["snarkjs fullProve · Groth16<br/>on-device, ~5–15 s<br/>proves age ≥ 18 + valid signature"]
+        KS["Encrypted keystore<br/>signed credential"]
+        PR["snarkjs fullProve · Groth16<br/>on-device<br/>proves predicate + valid signature"]
         KS --> PR
     end
 
     QR["QR PAYLOAD<br/>Groth16 proof + public signals<br/>256 B base64 — no PII"]
 
-    subgraph verifier["WEB VERIFIER — stores no PII"]
+    subgraph verifier["VERIFIER — stores no PII"]
         direction LR
         SCAN["Scan QR"]
         TX["Build + submit transaction"]
@@ -77,46 +77,23 @@ flowchart TB
     class issuer,ISS,verifier,SCAN,TX,QR neutral;
 ```
 
-### What makes it work
-
-| Layer | Tech | Role |
-|-------|------|------|
-| **Circuit** | Circom 2.x + Groth16 | proves `age ≥ 18` + valid issuer signature |
-| **Mobile** | React Native / Expo + snarkjs | holds PII, proves on-device, shows QR |
-| **Web verifier** | React / Vite | scans QR, submits tx, stores zero PII |
-| **On-chain** | Anchor (Solana) | verifies Groth16, nullifier PDA blocks replays |
-| **Issuer** | Node mock | signs credentials, manages `NIK → secret` for nullifiers |
-
 ### Privacy contrast
 
 | | Traditional KYC | Kage |
 |---|---|---|
-| Verifier stores | `{ NIK, name, address }` | `{ wallet, nullifier, slot }` |
+| Verifier stores | `{ id, name, address }` | `{ wallet, nullifier, slot }` |
 | One breach | mass PII leak | nothing useful |
 | Sybil-resistant | ✅ (but linkable everywhere) | ✅ (via nullifier) |
 | User reveals | everything | a single `pass` bit |
 
-➡️ **[Explore the repo →](https://github.com/KageHQ/proven-kyc)**
-
 ---
 
-## 🧭 Principles
+## Principles
 
 - **Data minimization** — verifiers learn the predicate result, nothing more.
 - **Self-custody of identity** — PII lives in the user's device keystore, not a central DB.
 - **On-chain accountability** — proofs are verified trustlessly; replays are rejected by construction.
-- **Honest scope** — we ship demos labeled as demos. See each repo's *Honest limitations* section.
-
----
-
-## 🚧 Current status
-
-`proven-kyc` is a **campus / hackathon demo** that shows the *shape* of zk-KYC, not a production system. Known gaps we're upfront about:
-
-- **Mock issuer** — signs without checking a real document (swap in a government eID / certified KYC provider).
-- **Global nullifier** — same across verifiers, so verifications are linkable (production: salt per verifier).
-- **Single-contributor trusted setup** — one fixed demo contribution (production: multi-party ceremony).
-- **No date oracle** — `currentDate` is a fixed input, spoofable via clock rollback (production: bind to on-chain slot).
+- **Honest scope** — we ship demos labeled as demos, and document their limits.
 
 ---
 
