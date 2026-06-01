@@ -29,7 +29,9 @@ Kage flips the model: the user holds their own credential, proves a *predicate* 
 
 ## How it works
 
-The user holds a signed credential on their device, generates a Groth16 proof of a predicate on-device, and shows it as a QR. The verifier submits the proof to a Solana program, which checks it and rejects replays, learning nothing but the result.
+The user holds a signed credential, generates a Groth16 proof of a predicate, and hands it to the verifier. The verifier submits the proof to a Solana program, which checks it and rejects replays, learning nothing but the result.
+
+> **v1 transport:** the user shares a **6-digit relay code**; the verifier app fetches the matching proof from the issuer relay. **QR-based handoff** (proof encoded directly in a QR payload, no relay round-trip) lands in the next update.
 
 ```mermaid
 %%{init: {"flowchart": {"htmlLabels": true, "nodeSpacing": 55, "rankSpacing": 55}, "themeVariables": {"fontSize": "18px"}}}%%
@@ -45,11 +47,11 @@ flowchart TB
         KS --> PR
     end
 
-    QR["QR PAYLOAD<br/>Groth16 proof + public signals<br/>256 B base64, no PII"]
+    REL["RELAY · v1<br/>6-digit code → Groth16 proof<br/>+ public signals, no PII<br/><i>(QR payload: next update)</i>"]
 
     subgraph verifier["VERIFIER · stores no PII"]
         direction LR
-        SCAN["Scan QR"]
+        SCAN["Enter relay code"]
         TX["Build + submit transaction"]
         SCAN --> TX
     end
@@ -64,8 +66,8 @@ flowchart TB
     end
 
     ISS -->|signed credential| KS
-    PR -->|encode| QR
-    QR -.->|scan| SCAN
+    PR -->|publish to relay| REL
+    REL -.->|fetch by code| SCAN
     TX -->|proof + signals| V
     EV -->|pass / fail| TX
 
@@ -74,7 +76,7 @@ flowchart TB
     classDef neutral fill:#26263a,stroke:#9090a8,color:#e8e8f0,stroke-width:2px;
     class device,KS,PR trust;
     class chain,V,IK,NUL,EV onchain;
-    class issuer,ISS,verifier,SCAN,TX,QR neutral;
+    class issuer,ISS,verifier,SCAN,TX,REL neutral;
 ```
 
 ### Privacy contrast
@@ -85,6 +87,27 @@ flowchart TB
 | One breach | mass PII leak | nothing useful |
 | Sybil-resistant | ✅ (but linkable everywhere) | ✅ (via nullifier) |
 | User reveals | everything | a single `pass` bit |
+
+---
+
+## Status
+
+**v1 — live demo.** End-to-end flow working: on-device Groth16 proving → 6-digit relay handoff → on-chain verify with replay rejection.
+
+| Component | Repo | State |
+|---|---|---|
+| Circuits (Groth16, predicate + EdDSA sig) | `kage-circuits` | ✅ v1 |
+| Issuer (credential signing + relay) | `kage-issuer` | ✅ v1 |
+| Solana program (verify + nullifier PDA) | `kage-program` | ✅ v1 |
+| Web verifier UI | `kage-web` | ✅ v1 |
+| Mobile holder app | `kage-mobile` | 🚧 in progress |
+| Shared SDK / IDL | `kage-shared` | ✅ v1 |
+| End-to-end harness | `kage-e2e` | ✅ v1 |
+
+### Next update
+
+- **QR handoff** — proof encoded directly in a QR payload, dropping the relay round-trip.
+- Mobile holder app to feature parity.
 
 ---
 
