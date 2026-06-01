@@ -37,18 +37,21 @@ Kage flips the model: the user holds their own credential, proves a *predicate* 
 
 A working zero-knowledge e-KYC demo. A user proves they hold a valid Indonesian KTP identity card **and** are age ≥ 18 — without revealing their NIK, name, or date of birth. A Solana program checks the proof on-chain and rejects replays.
 
-```
-Mobile (holds PII)              QR (proof only, no PII)         Solana
-┌─────────────────────┐         ┌───────────────────┐           ┌────────────────────────┐
-│ NIK in device        │  prove  │ Groth16 proof +   │  submit   │ verify proof           │
-│ keystore (encrypted) │ ──────► │ public signals    │ ────────► │ check issuer pubkey    │
-│                      │         │ (256 B base64)    │           │ initialize nullifier   │
-│ snarkjs fullProve    │         └───────────────────┘           │ emit Verified{wallet}  │
-│ (on-device, ~5–15 s) │              ▲ scan                     └────────────────────────┘
-└─────────────────────┘         ┌───┴───────────────┐
-                                 │ Web verifier       │
-                                 │ (stores no PII)    │
-                                 └────────────────────┘
+```mermaid
+flowchart LR
+    M["📱 Mobile<br/>holds PII<br/>NIK in encrypted keystore<br/>snarkjs fullProve ~5–15s"]
+    Q["🔳 QR<br/>Groth16 proof + public signals<br/>256 B base64 · no PII"]
+    W["🌐 Web verifier<br/>stores no PII"]
+    S["⛓️ Solana<br/>verify proof<br/>check issuer pubkey<br/>init nullifier PDA<br/>emit Verified{wallet}"]
+
+    M -->|prove| Q
+    Q -.->|scan| W
+    W -->|submit tx| S
+
+    style M fill:#1e1e2e,stroke:#888,color:#fff
+    style Q fill:#2a2a3a,stroke:#888,color:#fff
+    style W fill:#1e1e2e,stroke:#888,color:#fff
+    style S fill:#14352a,stroke:#14F195,color:#fff
 ```
 
 ### What makes it work
