@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="./banner.svg" alt="Kage" width="420" />
+<img src="./banner.png" alt="Kage" width="420" />
 
-<br/>
+# Kage
 
 *The proof steps into the light. Your identity stays in the dark.*
 
@@ -12,13 +12,7 @@
 
 </div>
 
----
-
-## Kage — 影 / かげ
-
-**Meaning:** *shadow, silhouette.*
-
-The verification is a shadow of you — its shape is enough to prove you're real and valid, while the substance casting it never leaves the dark. Zero-knowledge identity, by design.
+The verification is a shadow of you — its shape is enough to prove you're real and valid, while the substance casting it never leaves the dark. **Kage** (影 / かげ — *shadow, silhouette*) is zero-knowledge identity, by design.
 
 ---
 
