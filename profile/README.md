@@ -1,10 +1,10 @@
 <div align="center">
 
-# 🛡️ Proven
+# 影 Kage
 
-### Privacy-preserving identity, proven with zero-knowledge.
+### Privacy-preserving identity, proven from the shadows.
 
-*Prove who you are. Reveal nothing you don't have to.*
+*The proof steps into the light. Your identity stays in the dark.*
 
 [![Solana](https://img.shields.io/badge/Solana-Anchor-14F195?logo=solana&logoColor=white)](https://www.anchor-lang.com/)
 [![Circom](https://img.shields.io/badge/Circom-Groth16-blue)](https://docs.circom.io/)
@@ -14,14 +14,22 @@
 
 ---
 
+## Kage — 影 / かげ
+
+**Meaning:** *shadow, silhouette.*
+
+The verification is a shadow of you — its shape is enough to prove you're real and valid, while the substance casting it never leaves the dark. Zero-knowledge identity, by design.
+
+---
+
 ## Who we are
 
 We build **zero-knowledge identity** infrastructure. Traditional KYC forces you to hand over your name, ID number, and date of birth — and every verifier that stores it becomes a breach waiting to happen.
 
-We flip the model: the user holds their own credential, proves a *predicate* about it (e.g. "age ≥ 18", "is a verified resident") on-device, and the verifier learns **only the answer** — never the underlying data.
+Kage flips the model: the user holds their own credential, proves a *predicate* about it (e.g. "age ≥ 18", "is a verified resident") on-device, and the verifier learns **only the answer** — never the underlying data.
 
 > **One breach of a traditional KYC store = mass PII leak.**
-> **One breach of a Proven verifier = nothing useful.**
+> **One breach of a Kage verifier = nothing useful.**
 
 ---
 
@@ -55,20 +63,20 @@ Mobile (holds PII)              QR (proof only, no PII)         Solana
 
 ### Privacy contrast
 
-| | Traditional KYC | Proven KYC |
+| | Traditional KYC | Kage |
 |---|---|---|
 | Verifier stores | `{ NIK, name, address }` | `{ wallet, nullifier, slot }` |
 | One breach | mass PII leak | nothing useful |
 | Sybil-resistant | ✅ (but linkable everywhere) | ✅ (via nullifier) |
 | User reveals | everything | a single `pass` bit |
 
-➡️ **[Explore the repo →](../../proven-kyc)**
+➡️ **[Explore the repo →](https://github.com/KageHQ/proven-kyc)**
 
 ---
 
 ## 🧭 Principles
 
-- **Data minimization** — verifiers should learn the predicate result, nothing more.
+- **Data minimization** — verifiers learn the predicate result, nothing more.
 - **Self-custody of identity** — PII lives in the user's device keystore, not a central DB.
 - **On-chain accountability** — proofs are verified trustlessly; replays are rejected by construction.
 - **Honest scope** — we ship demos labeled as demos. See each repo's *Honest limitations* section.
@@ -90,6 +98,6 @@ Mobile (holds PII)              QR (proof only, no PII)         Solana
 
 **Built on Solana · Powered by Groth16 zk-SNARKs**
 
-*Identity you control. Verification you can trust.*
+*影 — identity you control, verification you can trust.*
 
 </div>
