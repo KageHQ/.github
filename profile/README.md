@@ -33,51 +33,24 @@ The user holds a signed credential, generates a Groth16 proof of a predicate, an
 
 > **v1 transport:** the user shares a **6-digit relay code**; the verifier app fetches the matching proof from the issuer relay. **QR-based handoff** (proof encoded directly in a QR payload, no relay round-trip) lands in the next update.
 
-```mermaid
-%%{init: {"flowchart": {"htmlLabels": true, "nodeSpacing": 55, "rankSpacing": 55}, "themeVariables": {"fontSize": "18px"}}}%%
-flowchart TB
-    subgraph issuer["ISSUER · one-time onboarding"]
-        ISS["Identity provider<br/>signs credential<br/>maps identity → nullifier secret"]
-    end
+**The short version — proving who you are, without revealing who you are:**
 
-    subgraph device["USER DEVICE · trust boundary, PII never leaves"]
-        direction LR
-        KS["Encrypted keystore<br/>signed credential"]
-        PR["snarkjs fullProve · Groth16<br/>on-device<br/>proves predicate + valid signature"]
-        KS --> PR
-    end
+<div align="center">
 
-    REL["RELAY · v1<br/>6-digit code → Groth16 proof<br/>+ public signals, no PII<br/><i>(QR payload: next update)</i>"]
+<img src="./simple-architecture.png" alt="Kage simple flow: get a digital ID, your phone makes a proof, share a 6-digit code, it's checked on Solana, verifier learns only valid and 18+" />
 
-    subgraph verifier["VERIFIER · stores no PII"]
-        direction LR
-        SCAN["Enter relay code"]
-        TX["Build + submit transaction"]
-        SCAN --> TX
-    end
+</div>
 
-    subgraph chain["SOLANA PROGRAM · Anchor"]
-        direction LR
-        V["Verify<br/>Groth16 proof"]
-        IK["Check<br/>issuer pubkey"]
-        NUL["Init nullifier PDA<br/>exists → reject replay"]
-        EV["Emit<br/>Verified{wallet, slot}"]
-        V --> IK --> NUL --> EV
-    end
+<details>
+<summary><b>The technical version</b> — issuer, holder device, relay, verifier, and Solana program</summary>
 
-    ISS -->|signed credential| KS
-    PR -->|publish to relay| REL
-    REL -.->|fetch by code| SCAN
-    TX -->|proof + signals| V
-    EV -->|pass / fail| TX
+<div align="center">
 
-    classDef trust fill:#1e1e2e,stroke:#6c6c8a,color:#e8e8f0,stroke-width:2px;
-    classDef onchain fill:#0f2a20,stroke:#14F195,color:#d8ffe9,stroke-width:2px;
-    classDef neutral fill:#26263a,stroke:#9090a8,color:#e8e8f0,stroke-width:2px;
-    class device,KS,PR trust;
-    class chain,V,IK,NUL,EV onchain;
-    class issuer,ISS,verifier,SCAN,TX,REL neutral;
-```
+<img src="./tech-architecture.png" alt="Kage technical architecture: issuer EdDSA-Poseidon signs a credential; holder device runs snarkjs fullProve (Groth16) behind a PII trust boundary; relay maps a single-use 6-digit code to the proof payload; verifier builds a transaction; Solana program runs Groth16 verify, issuer/scope match, and nullifier PDA replay rejection" />
+
+</div>
+
+</details>
 
 ### Privacy contrast
 
